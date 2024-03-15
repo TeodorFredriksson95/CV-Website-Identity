@@ -3,7 +3,9 @@
     public interface IConfigurationService
     {
         string GetJwtSecretKey();
-        string GetJwtIssuer();
-        string GetJwtAudience();
+        string GetJwtConfigIssuer();
+        string GetJwtConfigAudience();
+        string GetJwtApiIssuer();
+        string GetJwtApiAudience();
     }
 }

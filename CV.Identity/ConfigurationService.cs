@@ -8,11 +8,21 @@
             _configuration = configuration;
         }
 
-        public string GetJwtAudience() => _configuration["Jwt:Audience"]!;
-
-        public string GetJwtIssuer()
+        public string GetJwtApiAudience()
         {
-            return _configuration["Jwt:Issuer"]!;
+            return _configuration["ApiAccess:Audience"]!;
+        }
+
+        public string GetJwtApiIssuer()
+        {
+            return _configuration["ApiAccess:Issuer"]!;
+        }
+
+        public string GetJwtConfigAudience() => _configuration["JwtConfig:Authentication:Audience"]!;
+
+        public string GetJwtConfigIssuer()
+        {
+            return _configuration["JwtConfig:Authentication:Issuer"]!;
         }
 
         public string GetJwtSecretKey()
