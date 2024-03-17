@@ -103,6 +103,7 @@ namespace CV.Identity.Controllers
                 var profileImageClaim = new Claim("profileImage", validPayload.Picture);
                 claims.Add(profileImageClaim);
             }
+
             //foreach (var claimPair in request.CustomClaims)
             //{
             //    var jsonElement = (JsonElement)claimPair.Value;
