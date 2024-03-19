@@ -23,7 +23,6 @@ namespace CV.Identity.Controllers
         [HttpGet(ApiEndpoints.PersonalApiKeys.Base)]
         public IActionResult GeneratePersonalApiKey()
         {
-            Console.WriteLine("hello");
             Console.WriteLine(User.Claims);
             foreach (var claim in User.Claims)
             {
@@ -67,17 +66,7 @@ namespace CV.Identity.Controllers
         public async Task<IActionResult> ValidateToken([FromBody] TokenModel tokenModel)
         {
             var validPayload = await GoogleJsonWebSignature.ValidateAsync(tokenModel.Token, new GoogleJsonWebSignature.ValidationSettings());
-            Console.WriteLine($"Issuer: {validPayload.Issuer}");
-            Console.WriteLine($"Subject: {validPayload.Subject}");
-            Console.WriteLine($"Audience: {validPayload.Audience}");
-            Console.WriteLine($"Email: {validPayload.Email}");
-            Console.WriteLine($"Email Verified: {validPayload.EmailVerified}");
-            Console.WriteLine($"Name: {validPayload.Name}");
-            Console.WriteLine($"Given Name: {validPayload.GivenName}");
-            Console.WriteLine($"Family Name: {validPayload.FamilyName}");
-            Console.WriteLine($"Picture: {validPayload.Picture}");
-            Console.WriteLine($"Locale: {validPayload.Locale}");
-            Console.WriteLine(validPayload);
+
 
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -85,12 +74,6 @@ namespace CV.Identity.Controllers
             var issuer = _configurationService.GetJwtConfigIssuer();
             var audience = _configurationService.GetJwtConfigAudience();
 
-            var apiiss = _configurationService.GetJwtApiIssuer();
-            var apiaud = _configurationService.GetJwtApiAudience();
-            Console.WriteLine(apiiss);
-            Console.WriteLine(apiaud);
-            Console.WriteLine(issuer);
-            Console.WriteLine(audience);
 
             var claims = new List<Claim>
         {
@@ -103,21 +86,6 @@ namespace CV.Identity.Controllers
                 var profileImageClaim = new Claim("profileImage", validPayload.Picture);
                 claims.Add(profileImageClaim);
             }
-
-            //foreach (var claimPair in request.CustomClaims)
-            //{
-            //    var jsonElement = (JsonElement)claimPair.Value;
-            //    var valueType = jsonElement.ValueKind switch
-            //    {
-            //        JsonValueKind.True => ClaimValueTypes.Boolean,
-            //        JsonValueKind.False => ClaimValueTypes.Boolean,
-            //        JsonValueKind.Number => ClaimValueTypes.Double,
-            //        _ => ClaimValueTypes.String
-            //    };
-
-            //    var claim = new Claim(claimPair.Key, claimPair.Value.ToString()!, valueType);
-            //    claims.Add(claim);
-            //}
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
