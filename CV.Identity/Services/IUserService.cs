@@ -1,4 +1,5 @@
 ﻿using CV.Identity.Models;
+using System.Security.Claims;
 
 namespace CV.Identity.Services
 {
@@ -6,5 +7,7 @@ namespace CV.Identity.Services
     {
         Task<bool> UserExists(string userId);
         Task CreateUser(User user);
+        Task<IEnumerable<Claim>> GetUserClaims (string userId);
+
     }
 }

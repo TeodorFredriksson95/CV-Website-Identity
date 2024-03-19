@@ -43,7 +43,30 @@ namespace CV.Identity.Controllers
 
             var apiKey = _tokenService.GenerateJwtToken(apiKeyClaims, issuer, audience, TimeSpan.FromDays(365)); 
             return Ok(new { apiKey });
-        }   
+        }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] TokenRefreshRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.RefreshToken))
+            {
+                return BadRequest("Refresh token is required.");
+            }
+
+            try
+            {
+                Console.WriteLine(request.RefreshToken);
+                Console.WriteLine(request);
+                var tokenResponse = await _tokenService.RefreshAccessTokenAsync(request.RefreshToken);
+                return Ok(tokenResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Invalid token." });
+            }
+        }
+
+
 
         [HttpPost(ApiEndpoints.OAuthProviders.Google)]
         public async Task<IActionResult> ValidateToken([FromBody] TokenModel tokenModel)
@@ -59,6 +82,10 @@ namespace CV.Identity.Controllers
                 await _userService.CreateUser(new User
                 {
                     UserId = validPayload.Subject,
+                    Email = validPayload.Email,
+                    FirstName = validPayload.Name,
+                    LastName = validPayload.FamilyName,
+                    CountryId = 242 //"other" country in countries table
                 });
             }
 

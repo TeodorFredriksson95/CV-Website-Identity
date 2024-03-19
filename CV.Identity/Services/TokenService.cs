@@ -1,10 +1,11 @@
 ﻿using CV.Identity.Database;
+using CV.Identity.Models;
 using CV.Identity.Repositories;
-using Google.Apis.Auth.OAuth2.Responses;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace CV.Identity.Services
@@ -13,12 +14,12 @@ namespace CV.Identity.Services
     {
         private readonly IConfigurationService _configurationService;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
-        private readonly IDbConnectionFactory _connectionFactory;
-        public TokenService(IConfigurationService configurationService, IRefreshTokenRepository refreshTokenRepository, IDbConnectionFactory dbConnectionFactory)
+        private readonly IUserService _userService;
+        public TokenService(IConfigurationService configurationService, IRefreshTokenRepository refreshTokenRepository, IUserService userService)
         {
             _configurationService = configurationService;
             _refreshTokenRepository = refreshTokenRepository;
-            _connectionFactory = dbConnectionFactory;
+            _userService = userService;
         }
         public string GenerateJwtToken(List<Claim> claims, string issuer, string audience, TimeSpan lifespan)
         {
@@ -37,47 +38,68 @@ namespace CV.Identity.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
 
-        }// Inside your TokenService class
-
-        public async Task<TokenResponse> RefreshAccessTokenAsync(string refreshTokenValue)
-        {
-
-            //var refreshToken = await _refreshTokenRepository.GetRefreshTokenAsync(refreshTokenValue);
-            //if (refreshToken == null || refreshToken.IsExpired || refreshToken.Revoked)
-            //{
-            //    throw new Exception("Invalid refresh token.");
-            //}
-
-            //// Assuming you have a method to get claims for a user
-            //var claims = await GetUserClaims(refreshToken.UserId);
-
-            //// Generate a new access token
-            //var accessToken = GenerateJwtToken(claims, _configurationService.GetJwtApiIssuer(), _configurationService.GetJwtApiAudience(), TimeSpan.FromHours(1));
-
-            //// Optionally, generate a new refresh token and invalidate the old one
-            //var newRefreshToken = Guid.NewGuid().ToString();
-            //refreshToken.Token = newRefreshToken; // Update the token value to the new one
-            //refreshToken.Expires = DateTime.UtcNow.AddDays(7); // Extend the expiration
-            //await _refreshTokenRepository.UpdateRefreshTokenAsync(refreshToken, dbConnection);
-
-            //return new TokenResponse
-            //{
-            //    AccessToken = accessToken,
-            //    RefreshToken = newRefreshToken
-            //};
-            throw new NotImplementedException();
         }
-        public async Task<string> GenerateAndStoreRefreshToken(string userId)
+
+        public async Task<TokenResponse> RefreshAccessTokenAsync(string oldRefreshToken)
         {
+            var oldTokenDetails = await _refreshTokenRepository.GetByTokenAsync(oldRefreshToken);
+            if (oldTokenDetails == null || oldTokenDetails.IsExpired || oldTokenDetails.Revoked)
+            {
+                Console.WriteLine(oldTokenDetails);
+                throw new Exception("Invalid refresh token.");
+            }
 
-            var refreshToken = Guid.NewGuid().ToString();
-            var expiryDate = DateTime.UtcNow.AddDays(7); 
 
-            await _refreshTokenRepository.GenerateAndStoreRefreshToken(userId, refreshToken, expiryDate);
+            var userId = oldTokenDetails.UserId;
+
+            RefreshToken newRefreshToken = oldTokenDetails;
+
+            if ((oldTokenDetails.ExpiresAt - DateTime.UtcNow).TotalDays < 1)
+            {
+                newRefreshToken = GenerateRefreshToken();
+                await _refreshTokenRepository.RevokeRefreshTokenAsync(oldRefreshToken, newRefreshToken.Token); // Optionally track the new token
+                await _refreshTokenRepository.StoreRefreshToken(userId, newRefreshToken.Token, newRefreshToken.ExpiresAt);
+            }
+
+            var userClaims = await _userService.GetUserClaims(userId);
+            var issuer = _configurationService.GetJwtConfigIssuer();
+            var audience = _configurationService.GetJwtConfigAudience();
+            var newAccessToken = GenerateJwtToken(userClaims.ToList(), issuer, audience, TimeSpan.FromHours(1));
+
+
+            return new TokenResponse
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken.Token
+            };
+        }
+
+        public async Task<RefreshToken> GenerateAndStoreRefreshToken(string userId)
+        {
+               
+            var refreshToken = GenerateRefreshToken();
+            refreshToken.UserId = userId;
+   
+            await _refreshTokenRepository.GenerateAndStoreRefreshToken(refreshToken);
 
             return refreshToken;
         }
 
+        public RefreshToken GenerateRefreshToken()
+        {
+            using var rngCryptoServiceProvider = new RNGCryptoServiceProvider();
+            var randomBytes = new byte[64];
+            rngCryptoServiceProvider.GetBytes(randomBytes);
+            var token = Convert.ToBase64String(randomBytes);
+
+            return new RefreshToken
+            {
+                Token = token,
+                ExpiresAt = DateTime.UtcNow.AddDays(7), 
+                CreatedAt = DateTime.UtcNow,
+                Revoked = false
+            };
+        }
 
     }
 }
