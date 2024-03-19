@@ -1,4 +1,8 @@
 ﻿
+using CV.Application.Repositories;
+using CV.Identity.Database;
+using CV.Identity.Repositories;
+using CV.Identity.Services;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -26,6 +30,23 @@ namespace CV.Identity
                            .AllowAnyMethod();
                 });
             });
+        }
+        public static IServiceCollection AddApplication(this IServiceCollection services)
+        {
+            services.AddSingleton<IRefreshTokenRepository, RefreshTokenRepository>();
+            services.AddScoped<ITokenService, TokenService>(); 
+
+            services.AddScoped<IUserService, UserService>(); 
+            services.AddScoped<IUserRepository, UserRepository>(); 
+
+            return services;
+        }
+
+        public static IServiceCollection AddDatabase(this IServiceCollection services, string connectionString)
+        {
+            services.AddSingleton<IDbConnectionFactory>(_ => new NpgsqlConnectionFactory(connectionString));
+            services.AddSingleton<DbInitializer>();
+            return services;
         }
     }
 }

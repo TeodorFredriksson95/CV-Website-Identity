@@ -7,72 +7,60 @@ using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
+using CV.Identity.Services;
 namespace CV.Identity.Controllers
 {
     public class AuthenticateController : Controller
     {
         private readonly IConfigurationService _configurationService;
-        private static readonly TimeSpan TokenLifetime = TimeSpan.FromHours(1);
+        private readonly ITokenService _tokenService;
+        private readonly IUserService _userService;
 
-        public AuthenticateController(IConfigurationService configurationService)
+        public AuthenticateController(IConfigurationService configurationService, ITokenService tokenService, IUserService userService)
         {
             _configurationService = configurationService;
+            _tokenService = tokenService;
+            _userService = userService;
         }
 
         [Authorize]
         [HttpGet(ApiEndpoints.PersonalApiKeys.Base)]
         public IActionResult GeneratePersonalApiKey()
         {
-            Console.WriteLine(User.Claims);
-            foreach (var claim in User.Claims)
-            {
-                Console.WriteLine($"Claim Type: {claim.Type}, Claim Value: {claim.Value}");
-            }
+     
             var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
             {
                 return Unauthorized(ModelState);
             }
-
+            var issuer = _configurationService.GetJwtApiIssuer();
+            var audience = _configurationService.GetJwtApiAudience();
             var apiKeyClaims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, userId),
             };
 
-            var apiKey = GenerateJwtToken(apiKeyClaims); 
+
+            var apiKey = _tokenService.GenerateJwtToken(apiKeyClaims, issuer, audience, TimeSpan.FromDays(365)); 
             return Ok(new { apiKey });
-        }
-
-        private string GenerateJwtToken(List<Claim> claims)
-        {
-            var key = Encoding.UTF8.GetBytes(_configurationService.GetJwtSecretKey());
-            var issuer = _configurationService.GetJwtApiIssuer();
-            var audience = _configurationService.GetJwtApiAudience();
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(claims),
-                Issuer = issuer,
-                Audience = audience,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
+        }   
 
         [HttpPost(ApiEndpoints.OAuthProviders.Google)]
         public async Task<IActionResult> ValidateToken([FromBody] TokenModel tokenModel)
         {
             var validPayload = await GoogleJsonWebSignature.ValidateAsync(tokenModel.Token, new GoogleJsonWebSignature.ValidationSettings());
 
-
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_configurationService.GetJwtSecretKey());
             var issuer = _configurationService.GetJwtConfigIssuer();
             var audience = _configurationService.GetJwtConfigAudience();
+
+            var userExists = await _userService.UserExists(validPayload.Subject);
+            if (!userExists)
+            {
+                await _userService.CreateUser(new User
+                {
+                    UserId = validPayload.Subject,
+                });
+            }
 
 
             var claims = new List<Claim>
@@ -86,20 +74,10 @@ namespace CV.Identity.Controllers
                 var profileImageClaim = new Claim("profileImage", validPayload.Picture);
                 claims.Add(profileImageClaim);
             }
+            var jwtToken = _tokenService.GenerateJwtToken(claims, issuer, audience, TimeSpan.FromHours(1));
+            var refresh_Token = await _tokenService.GenerateAndStoreRefreshToken(validPayload.Subject);
 
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.Add(TokenLifetime),
-                Issuer = issuer,
-                Audience = audience,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-
-            var jwt = tokenHandler.WriteToken(token);
-            return Ok(new { token = jwt });
+            return Ok(new { accessToken = jwtToken, refreshToken = refresh_Token });
         }
     }
 }

@@ -1,4 +1,10 @@
-﻿namespace CV.Identity
+﻿using CV.Identity.Models;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+
+namespace CV.Identity
 {
     public class ConfigurationService : IConfigurationService
     {
@@ -7,6 +13,8 @@
         {
             _configuration = configuration;
         }
+
+
 
         public string GetJwtApiAudience()
         {
