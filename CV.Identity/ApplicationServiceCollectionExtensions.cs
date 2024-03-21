@@ -1,8 +1,12 @@
-﻿
-using CV.Application.Repositories;
-using CV.Identity.Database;
-using CV.Identity.Repositories;
-using CV.Identity.Services;
+﻿using CV.Identity.Database;
+using CV.Identity.Repositories.ApiKeyRepo;
+using CV.Identity.Repositories.RefreshTokenRepo;
+using CV.Identity.Repositories.UsersRepo;
+using CV.Identity.Services.ApiKeyService;
+using CV.Identity.Services.ApiTokenService;
+using CV.Identity.Services.ConfigurationService;
+using CV.Identity.Services.TokenService;
+using CV.Identity.Services.UserService;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -34,7 +38,11 @@ namespace CV.Identity
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
             services.AddSingleton<IRefreshTokenRepository, RefreshTokenRepository>();
-            services.AddScoped<ITokenService, TokenService>(); 
+            services.AddScoped<ITokenService, TokenService>();
+            
+
+            services.AddScoped<IApiKeyService, ApiKeyService>(); 
+            services.AddScoped<IApiKeyRepository, ApiKeyRepository>(); 
 
             services.AddScoped<IUserService, UserService>(); 
             services.AddScoped<IUserRepository, UserRepository>(); 

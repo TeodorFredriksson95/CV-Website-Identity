@@ -1,6 +1,9 @@
 ﻿using CV.Identity.Database;
 using CV.Identity.Models;
-using CV.Identity.Repositories;
+using CV.Identity.Repositories.RefreshTokenRepo;
+using CV.Identity.Responses.TokenResponses;
+using CV.Identity.Services.ConfigurationService;
+using CV.Identity.Services.UserService;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -8,7 +11,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace CV.Identity.Services
+namespace CV.Identity.Services.TokenService
 {
     public class TokenService : ITokenService
     {
@@ -64,7 +67,7 @@ namespace CV.Identity.Services
             var userClaims = await _userService.GetUserClaims(userId);
             var issuer = _configurationService.GetJwtConfigIssuer();
             var audience = _configurationService.GetJwtConfigAudience();
-            var newAccessToken = GenerateJwtToken(userClaims.ToList(), issuer, audience, TimeSpan.FromHours(1));
+            var newAccessToken = GenerateJwtToken(userClaims.ToList(), issuer, audience, TimeSpan.FromSeconds(3));
 
 
             return new TokenResponse
@@ -76,10 +79,10 @@ namespace CV.Identity.Services
 
         public async Task<RefreshToken> GenerateAndStoreRefreshToken(string userId)
         {
-               
+
             var refreshToken = GenerateRefreshToken();
             refreshToken.UserId = userId;
-   
+
             await _refreshTokenRepository.GenerateAndStoreRefreshToken(refreshToken);
 
             return refreshToken;
@@ -95,7 +98,7 @@ namespace CV.Identity.Services
             return new RefreshToken
             {
                 Token = token,
-                ExpiresAt = DateTime.UtcNow.AddDays(7), 
+                ExpiresAt = DateTime.UtcNow.AddDays(7),
                 CreatedAt = DateTime.UtcNow,
                 Revoked = false
             };

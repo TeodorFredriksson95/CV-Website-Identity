@@ -1,4 +1,4 @@
-﻿namespace CV.Identity.Models
+﻿namespace CV.Identity.Responses.TokenResponses
 {
     public class TokenResponse
     {

@@ -7,7 +7,11 @@ using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
-using CV.Identity.Services;
+using CV.Identity.Services.TokenService;
+using CV.Identity.Services.UserService;
+using CV.Identity.Requests.TokenRequests;
+using CV.Identity.Services.ConfigurationService;
+using CV.Identity.Services.ApiKeyService;
 namespace CV.Identity.Controllers
 {
     public class AuthenticateController : Controller
@@ -15,33 +19,40 @@ namespace CV.Identity.Controllers
         private readonly IConfigurationService _configurationService;
         private readonly ITokenService _tokenService;
         private readonly IUserService _userService;
+        private readonly IApiKeyService _apiKeyService;
 
-        public AuthenticateController(IConfigurationService configurationService, ITokenService tokenService, IUserService userService)
+        public AuthenticateController(IConfigurationService configurationService, ITokenService tokenService, IUserService userService, IApiKeyService apiKeyService)
         {
             _configurationService = configurationService;
             _tokenService = tokenService;
             _userService = userService;
+            _apiKeyService = apiKeyService;
         }
 
         [Authorize]
         [HttpGet(ApiEndpoints.PersonalApiKeys.Base)]
-        public IActionResult GeneratePersonalApiKey()
+        public async Task<IActionResult> GeneratePersonalApiKey()
         {
-     
             var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
             {
                 return Unauthorized(ModelState);
             }
+
+            var expClaim = User.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Exp)?.Value;
+ 
+
             var issuer = _configurationService.GetJwtApiIssuer();
             var audience = _configurationService.GetJwtApiAudience();
             var apiKeyClaims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, userId),
-            };
+                {
+                    new Claim(JwtRegisteredClaimNames.Sub, userId),
+                };
+            Console.WriteLine(userId);
+            var apiKey = _tokenService.GenerateJwtToken(apiKeyClaims, issuer, audience, TimeSpan.FromDays(365));
+            await _apiKeyService.RevokePreviousApiKey(userId, apiKey);
+            await _apiKeyService.StoreApiKey(userId, apiKey, DateTime.UtcNow.AddYears(1));
 
-
-            var apiKey = _tokenService.GenerateJwtToken(apiKeyClaims, issuer, audience, TimeSpan.FromDays(365)); 
             return Ok(new { apiKey });
         }
 
@@ -55,8 +66,6 @@ namespace CV.Identity.Controllers
 
             try
             {
-                Console.WriteLine(request.RefreshToken);
-                Console.WriteLine(request);
                 var tokenResponse = await _tokenService.RefreshAccessTokenAsync(request.RefreshToken);
                 return Ok(tokenResponse);
             }
@@ -101,7 +110,7 @@ namespace CV.Identity.Controllers
                 var profileImageClaim = new Claim("profileImage", validPayload.Picture);
                 claims.Add(profileImageClaim);
             }
-            var jwtToken = _tokenService.GenerateJwtToken(claims, issuer, audience, TimeSpan.FromHours(1));
+            var jwtToken = _tokenService.GenerateJwtToken(claims, issuer, audience, TimeSpan.FromSeconds(3));
             var refresh_Token = await _tokenService.GenerateAndStoreRefreshToken(validPayload.Subject);
 
             return Ok(new { accessToken = jwtToken, refreshToken = refresh_Token });

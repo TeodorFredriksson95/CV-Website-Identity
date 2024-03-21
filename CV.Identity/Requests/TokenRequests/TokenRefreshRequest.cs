@@ -1,4 +1,4 @@
-﻿namespace CV.Identity.Models
+﻿namespace CV.Identity.Requests.TokenRequests
 {
     public class TokenRefreshRequest
     {

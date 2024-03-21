@@ -6,7 +6,7 @@ using System;
 using CV.Identity.Models;
 using System.Data;
 
-namespace CV.Identity
+namespace CV.Identity.Services.ConfigurationService
 {
     public interface IConfigurationService
     {

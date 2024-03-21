@@ -1,11 +1,12 @@
 ﻿using CV.Identity.Database;
-using CV.Identity.Models;using System.Data;
+using CV.Identity.Models;
+using System.Data;
 
 using Microsoft.AspNetCore.Connections;
 using Dapper;
 using Newtonsoft.Json.Linq;
 
-namespace CV.Identity.Repositories
+namespace CV.Identity.Repositories.UsersRepo
 {
     public class UserRepository : IUserRepository
     {

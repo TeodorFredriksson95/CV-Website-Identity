@@ -4,7 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace CV.Identity
+namespace CV.Identity.Services.ConfigurationService
 {
     public class ConfigurationService : IConfigurationService
     {

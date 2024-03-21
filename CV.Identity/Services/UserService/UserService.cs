@@ -1,9 +1,9 @@
 ﻿using CV.Identity.Models;
-using CV.Identity.Repositories;
+using CV.Identity.Repositories.UsersRepo;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace CV.Identity.Services
+namespace CV.Identity.Services.UserService
 {
     public class UserService : IUserService
     {
@@ -14,7 +14,7 @@ namespace CV.Identity.Services
         }
         public async Task CreateUser(User user)
         {
-             await _userRepository.CreateUser(user);
+            await _userRepository.CreateUser(user);
         }
 
         public async Task<IEnumerable<Claim>> GetUserClaims(string userId)
