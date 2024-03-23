@@ -51,6 +51,8 @@ namespace CV.Identity.Repositories.ApiKeyRepo
             return await dbConnection.QuerySingleOrDefaultAsync<ApiToken>(sql, new { UserId = userId });
         }
 
+  
+
         public async Task RevokeApiKey(string oldApiKey, string newApiKey = null)
         {
             const string sql = @"UPDATE api_keys SET revoked = TRUE, replaced_by_api_key = @ReplacedByApiKey WHERE api_key = @ApiKey";

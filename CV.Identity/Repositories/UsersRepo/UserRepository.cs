@@ -18,8 +18,8 @@ namespace CV.Identity.Repositories.UsersRepo
         public async Task CreateUser(User user)
         {
             const string command = @"
-            INSERT INTO users (user_id, firstname, lastname, email, country_id)
-            VALUES (@UserId, @FirstName, @LastName, @Email, @CountryId)"
+            INSERT INTO users (user_id, firstname, lastname, email, country_id, open_for_work)
+            VALUES (@UserId, @FirstName, @LastName, @Email, @CountryId, @OpenForWork)"
             ;
 
             using var connection = await _connectionFactory.CreateConnectionAsync();

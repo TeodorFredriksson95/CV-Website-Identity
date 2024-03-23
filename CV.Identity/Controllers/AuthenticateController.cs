@@ -53,6 +53,7 @@ namespace CV.Identity.Controllers
             await _apiKeyService.RevokePreviousApiKey(userId, apiKey);
             await _apiKeyService.StoreApiKey(userId, apiKey, DateTime.UtcNow.AddYears(1));
 
+
             return Ok(new { apiKey });
         }
 
@@ -94,7 +95,8 @@ namespace CV.Identity.Controllers
                     Email = validPayload.Email,
                     FirstName = validPayload.Name,
                     LastName = validPayload.FamilyName,
-                    CountryId = 242 //"other" country in countries table
+                    CountryId = 242, //"other" country in countries table
+                    OpenForWork = true, //default
                 });
             }
 
