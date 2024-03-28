@@ -9,5 +9,6 @@ namespace CV.Identity.Services.UserService
         Task CreateUser(User user);
         Task<IEnumerable<Claim>> GetUserClaims(string userId);
 
+        Task UpdateLoginCount(string userId);
     }
 }

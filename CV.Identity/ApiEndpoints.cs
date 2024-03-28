@@ -8,6 +8,8 @@
         {
             public const string Base = $"{ApiBase}/authenticate";
             public const string Google = $"{Base}/google";
+            public const string Linkedin = $"{Base}/linkedin";
+            public const string Github = $"{Base}/github";
         }
 
         public static class PersonalApiKeys

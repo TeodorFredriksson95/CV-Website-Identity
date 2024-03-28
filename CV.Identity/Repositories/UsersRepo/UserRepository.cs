@@ -18,8 +18,8 @@ namespace CV.Identity.Repositories.UsersRepo
         public async Task CreateUser(User user)
         {
             const string command = @"
-            INSERT INTO users (user_id, firstname, lastname, email, country_id, open_for_work)
-            VALUES (@UserId, @FirstName, @LastName, @Email, @CountryId, @OpenForWork)"
+            INSERT INTO users (user_id, firstname, lastname, email, country_id)
+            VALUES (@UserId, @FirstName, @LastName, @Email, @CountryId)"
             ;
 
             using var connection = await _connectionFactory.CreateConnectionAsync();
@@ -38,6 +38,13 @@ namespace CV.Identity.Repositories.UsersRepo
 
             using var connection = await _connectionFactory.CreateConnectionAsync();
             return await connection.QuerySingleOrDefaultAsync<User>(query, new { UserId = userId });
+        }
+
+        public async Task UpdateLoginCount(string userId)
+        {
+            const string query = "UPDATE users SET login_count = login_count + 1 WHERE user_id = @UserId";
+            using var connection = await _connectionFactory.CreateConnectionAsync();
+            await connection.ExecuteAsync(query, new { UserId = userId });
         }
 
         public async Task<bool> UserExists(string userId)

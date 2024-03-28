@@ -32,6 +32,11 @@ namespace CV.Identity.Services.UserService
             return claims;
         }
 
+        public async Task UpdateLoginCount(string userId)
+        {
+            await _userRepository.UpdateLoginCount(userId);
+        }
+
         public async Task<bool> UserExists(string userId)
         {
             return await _userRepository.UserExists(userId);

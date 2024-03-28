@@ -67,7 +67,7 @@ namespace CV.Identity.Services.TokenService
             var userClaims = await _userService.GetUserClaims(userId);
             var issuer = _configurationService.GetJwtConfigIssuer();
             var audience = _configurationService.GetJwtConfigAudience();
-            var newAccessToken = GenerateJwtToken(userClaims.ToList(), issuer, audience, TimeSpan.FromSeconds(3));
+            var newAccessToken = GenerateJwtToken(userClaims.ToList(), issuer, audience, TimeSpan.FromMinutes(60));
 
 
             return new TokenResponse

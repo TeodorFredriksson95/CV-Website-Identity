@@ -8,6 +8,7 @@ namespace CV.Identity.Repositories.UsersRepo
         Task CreateUser(User user);
 
         Task<User> GetUser(string userId);
+        Task UpdateLoginCount(string userId);
 
     }
 }

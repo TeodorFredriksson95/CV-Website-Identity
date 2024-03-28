@@ -37,6 +37,8 @@ namespace CV.Identity
         }
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
+
+
             services.AddSingleton<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddScoped<ITokenService, TokenService>();
             
