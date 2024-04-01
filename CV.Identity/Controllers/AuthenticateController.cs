@@ -350,7 +350,7 @@ namespace CV.Identity.Controllers
         public IActionResult InitiateLinkedInLogin(string state)
         {
             Console.WriteLine($"{state}");
-            var clientId = "774ebboggfsu09";
+            var clientId = "773qu5fldzxrvs";
             var redirectUri = "localhost:3000"; // Your backend callback endpoint
             Console.WriteLine($"{redirectUri}");
 
@@ -418,8 +418,8 @@ namespace CV.Identity.Controllers
                 new KeyValuePair<string, string>("Content-Type", "application/x-www-form-urlencoded"),
                 new KeyValuePair<string, string>("grant_type", "authorization_code"),
                 new KeyValuePair<string, string>("code", code),
-                new KeyValuePair<string, string>("client_id", "774ebboggfsu09"),
-                new KeyValuePair<string, string>("client_secret", "up9SPM4eStkDgGFp"),
+                new KeyValuePair<string, string>("client_id", "773qu5fldzxrvs"),
+                new KeyValuePair<string, string>("client_secret", "LdQQja6ZlsByMIMn"),
                 new KeyValuePair<string, string>("redirect_uri", redirectUri),
             });
             Console.WriteLine($"{redirectUri}");

@@ -8,13 +8,14 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 
+var connectionString = Environment.GetEnvironmentVariable("unidevwebcon");
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddApplication();
-builder.Services.AddDatabase(config["Database:ConnectionString"]!);
+builder.Services.AddDatabase(connectionString);
 builder.Services.AddJWTService(builder.Configuration);
 builder.Services.AddCorsPolicy(builder.Configuration);
 builder.Services.AddAuthentication(x =>
