@@ -24,9 +24,16 @@ namespace CV.Identity.Database
 
         public async Task<IDbConnection> CreateConnectionAsync(CancellationToken token = default)
         {
-            var connection = new NpgsqlConnection(_connectionString);
-            await connection.OpenAsync(token);
-            return connection;
+            try
+            {
+                var connection = new NpgsqlConnection(_connectionString);
+                await connection.OpenAsync(token);
+                return connection;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 
 var connectionString = Environment.GetEnvironmentVariable("unidevwebcon");
+var jwtTokenSecret = Environment.GetEnvironmentVariable("JWT_TOKEN_SECRET");
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -27,7 +28,7 @@ builder.Services.AddAuthentication(x =>
 {
     x.TokenValidationParameters = new TokenValidationParameters
     {
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWT_TOKEN_SECRET"]!)),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtTokenSecret)),
         ValidateIssuerSigningKey = true,
         ValidateLifetime = true,
         ValidIssuer = config["JwtConfig:Authentication:Issuer"],
