@@ -28,10 +28,12 @@ namespace CV.Identity.Database
             {
                 var connection = new NpgsqlConnection(_connectionString);
                 await connection.OpenAsync(token);
+                Console.WriteLine("Connection opened successfully.");
                 return connection;
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Error opening database connection: {ex.Message}");
                 throw;
             }
         }
