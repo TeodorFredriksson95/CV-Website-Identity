@@ -34,98 +34,11 @@ namespace CV.Identity.Controllers
             _apiKeyService = apiKeyService;
         }
 
-        public class GitHubEmail
-        {
-            [JsonPropertyName("email")]
-            public string Email { get; set; }
+    
 
-            [JsonPropertyName("primary")]
-            public bool Primary { get; set; }
 
-            [JsonPropertyName("verified")]
-            public bool Verified { get; set; }
 
-            // If you decide to use the visibility field later on
-            [JsonPropertyName("visibility")]
-            public string Visibility { get; set; }
-        }
 
-        public class GitHubUser
-        {
-            [JsonPropertyName("login")]
-            public string Login { get; set; }
-
-            [JsonPropertyName("id")]
-            public long Id { get; set; }
-
-            [JsonPropertyName ("name")]
-            public string Name { get; set; }
-
-            // Email will be populated separately from the /user/emails endpoint
-            public string Email { get; set; }
-
-            [JsonPropertyName("node_id")]
-            public string NodeId { get; set; }
-
-            [JsonPropertyName("avatar_url")]
-            public string AvatarUrl { get; set; }
-
-            [JsonPropertyName("gravatar_id")]
-            public string GravatarId { get; set; }
-
-            [JsonPropertyName("url")]
-            public string Url { get; set; }
-
-            [JsonPropertyName("html_url")]
-            public string HtmlUrl { get; set; }
-
-            [JsonPropertyName("followers_url")]
-            public string FollowersUrl { get; set; }
-
-            [JsonPropertyName("following_url")]
-            public string FollowingUrl { get; set; }
-
-            [JsonPropertyName("gists_url")]
-            public string GistsUrl { get; set; }
-
-            [JsonPropertyName("starred_url")]
-            public string StarredUrl { get; set; }
-
-            [JsonPropertyName("subscriptions_url")]
-            public string SubscriptionsUrl { get; set; }
-
-            [JsonPropertyName("organizations_url")]
-            public string OrganizationsUrl { get; set; }
-
-            [JsonPropertyName("repos_url")]
-            public string ReposUrl { get; set; }
-
-            [JsonPropertyName("events_url")]
-            public string EventsUrl { get; set; }
-
-            [JsonPropertyName("received_events_url")]
-            public string ReceivedEventsUrl { get; set; }
-
-            [JsonPropertyName("type")]
-            public string Type { get; set; }
-
-            // Add any additional properties you need to deserialize that are part of the GitHub User API response
-        }
-
-        public class GitHubTokenModel
-        {
-            public string Code { get; set; }
-        }
-
-        public class GitHubTokenResponse
-        {
-            [JsonPropertyName("access_token")]
-            public string AccessToken { get; set; }
-
-            [JsonPropertyName("scope")]
-            public int Scope { get; set; }
-
-        }
         private async Task<string> GitHubExchangeCodeForAccessToken(string code)
         {
             var client = new HttpClient();
@@ -153,7 +66,7 @@ namespace CV.Identity.Controllers
         {
             var client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-            client.DefaultRequestHeaders.UserAgent.TryParseAdd("request");//Set the User Agent to "request"
+            client.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
 
             var userResponse = await client.GetAsync("https://api.github.com/user");
             var emailResponse = await client.GetAsync("https://api.github.com/user/emails");
@@ -164,16 +77,15 @@ namespace CV.Identity.Controllers
                 var emailContent = await emailResponse.Content.ReadAsStringAsync();
 
                 var userInfo = JsonSerializer.Deserialize<GitHubUser>(userContent);
-                var emailList = JsonSerializer.Deserialize<List<GitHubEmail>>(emailContent);
+                var emailList = JsonSerializer.Deserialize<List<GithubEmail>>(emailContent);
 
-                // Assuming GitHubEmail class is defined as shown previously
                 var primaryEmail = emailList.FirstOrDefault(email => email.Primary && email.Verified)?.Email;
                 if (primaryEmail != null)
                 {
-                    userInfo.Email = primaryEmail; // Set the primary email on the userInfo object
+                    userInfo.Email = primaryEmail; 
                 }
 
-                return userInfo; // This now includes the email
+                return userInfo; 
             }
             var errorContent = await userResponse.Content.ReadAsStringAsync();
             Console.WriteLine($"Failed to exchange code for access token: {errorContent}");
@@ -183,18 +95,15 @@ namespace CV.Identity.Controllers
 
         [HttpPost]
         [Route("/api/auth/github")]
-        public async Task<IActionResult> HandleGitHubCallback([FromBody] GitHubTokenModel code)
+        public async Task<IActionResult> HandleGitHubCallback([FromBody] GithubTokenModel code)
         {
-            var redirectUri = "http://localhost:3000/login"; // Your backend callback endpoint
-            Console.WriteLine($"{redirectUri}");
-            // Step 1: Exchange code for access token
+
             var accessToken = await GitHubExchangeCodeForAccessToken(code.Code);
             if (string.IsNullOrEmpty(accessToken))
             {
                 return BadRequest("Failed to retrieve access token.");
             }
 
-            // Step 2: Retrieve user information from LinkedIn
             var githubUser = await GetGitHubUserInfo(accessToken);
             if (githubUser == null)
             {
@@ -217,7 +126,7 @@ namespace CV.Identity.Controllers
                     Email = githubUser.Email,
                     FirstName = nameParts[0],
                     LastName = nameParts[1],
-                    CountryId = 242, //"other" country in countries table
+                    CountryId = 242, 
                 });
             }
 
@@ -293,9 +202,8 @@ namespace CV.Identity.Controllers
         public async Task<IActionResult> LinkedInCallback([FromBody] LinkedinCode code)
         {
             Console.WriteLine("second callback", code);
-            var redirectUri = "http://localhost:3000/login"; // Your backend callback endpoint
-            Console.WriteLine($"{redirectUri}");
-            // Step 1: Exchange code for access token
+            var redirectUri = "http://localhost:3000/login"; 
+
             var accessToken = await ExchangeCodeForAccessToken(code.Code, redirectUri);
             if (string.IsNullOrEmpty(accessToken))
             {
@@ -321,7 +229,7 @@ namespace CV.Identity.Controllers
                     Email = linkedInUser.Email,
                     FirstName = linkedInUser.Firstname,
                     LastName = linkedInUser.LastName,
-                    CountryId = 242, //"other" country in countries table
+                    CountryId = 242, 
                 });
             }
 
@@ -349,10 +257,7 @@ namespace CV.Identity.Controllers
         [Route("api/auth/linkedin/initiate")]
         public IActionResult InitiateLinkedInLogin(string state)
         {
-            Console.WriteLine($"{state}");
             var clientId = "773qu5fldzxrvs";
-            var redirectUri = "localhost:3000"; // Your backend callback endpoint
-            Console.WriteLine($"{redirectUri}");
 
 
             var linkedInUrl = $"https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id={clientId}&state={state}&redirect_uri=http://localhost:3000/login&scope=email%20openid%20w_member_social%20profile";
