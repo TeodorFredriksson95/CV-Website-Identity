@@ -47,7 +47,7 @@ namespace CV.Identity.Controllers
             var requestContent = new FormUrlEncodedContent(new Dictionary<string, string>
                     {
                         {"client_id", "9ddff8bc7ebe96a759b3"},
-                        {"client_secret", "c437e0f42608687d41ce3658c02dffc7e37f06c8"},
+                        {"client_secret", gitHubSecret},
                         {"code", code},
                     });
 
