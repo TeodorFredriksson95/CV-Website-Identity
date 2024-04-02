@@ -57,7 +57,6 @@ namespace CV.Identity.Controllers
                 var content = await response.Content.ReadAsStringAsync();
                 var parsedContent = HttpUtility.ParseQueryString(content);
                 var accessToken = parsedContent["access_token"];
-                Console.WriteLine(accessToken);
                 return accessToken;
             }
 
@@ -90,7 +89,6 @@ namespace CV.Identity.Controllers
                 return userInfo; 
             }
             var errorContent = await userResponse.Content.ReadAsStringAsync();
-            Console.WriteLine($"Failed to exchange code for access token: {errorContent}");
 
             return null;
         }
@@ -171,7 +169,6 @@ namespace CV.Identity.Controllers
                 {
                     new Claim(JwtRegisteredClaimNames.Sub, userId),
                 };
-            Console.WriteLine(userId);
             var apiKey = _tokenService.GenerateJwtToken(apiKeyClaims, issuer, audience, TimeSpan.FromDays(365));
             await _apiKeyService.RevokePreviousApiKey(userId, apiKey);
             await _apiKeyService.StoreApiKey(userId, apiKey, DateTime.UtcNow.AddYears(1));
@@ -203,7 +200,6 @@ namespace CV.Identity.Controllers
         [HttpPost(ApiEndpoints.OAuthProviders.Linkedin)]
         public async Task<IActionResult> LinkedInCallback([FromBody] LinkedinCode code)
         {
-            Console.WriteLine("second callback", code);
             var redirectUri = "https://unidevweb.com/login";
 
 
@@ -331,14 +327,12 @@ namespace CV.Identity.Controllers
                 new KeyValuePair<string, string>("client_secret", linkedinSecret),
                 new KeyValuePair<string, string>("redirect_uri", redirectUri),
             });
-            Console.WriteLine($"{redirectUri}");
 
             var response = await client.PostAsync("https://www.linkedin.com/oauth/v2/accessToken", requestContent);
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
                 var tokenResponse = JsonSerializer.Deserialize<LinkedInTokenResponse>(content);
-                Console.WriteLine(tokenResponse?.AccessToken);
                 return tokenResponse?.AccessToken;
             }
 
@@ -348,7 +342,6 @@ namespace CV.Identity.Controllers
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, "https://api.linkedin.com/v2/userinfo");
             requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-            Console.WriteLine(accessToken);
 
             var client = new HttpClient();
             var response = await client.SendAsync(requestMessage);

@@ -48,7 +48,6 @@ namespace CV.Identity.Services.TokenService
             var oldTokenDetails = await _refreshTokenRepository.GetByTokenAsync(oldRefreshToken);
             if (oldTokenDetails == null || oldTokenDetails.IsExpired || oldTokenDetails.Revoked)
             {
-                Console.WriteLine(oldTokenDetails);
                 throw new Exception("Invalid refresh token.");
             }
 

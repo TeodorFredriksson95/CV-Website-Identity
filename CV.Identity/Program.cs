@@ -10,6 +10,8 @@ var config = builder.Configuration;
 
 var connectionString = Environment.GetEnvironmentVariable("unidevwebcon");
 var jwtTokenSecret = Environment.GetEnvironmentVariable("JWT_TOKEN_SECRET");
+var jwtConfigIssuer = Environment.GetEnvironmentVariable("IDENTITY_JWTCONFIG_ISSUER");
+var jwtConfigAudience = Environment.GetEnvironmentVariable("IDENTITY_JWTCONFIG_AUDIENCE");
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -31,8 +33,8 @@ builder.Services.AddAuthentication(x =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtTokenSecret)),
         ValidateIssuerSigningKey = true,
         ValidateLifetime = true,
-        ValidIssuer = config["JwtConfig:Authentication:Issuer"],
-        ValidAudience = config["JwtConfig:Authentication:Audience"],
+        ValidIssuer = jwtConfigIssuer,
+        ValidAudience = jwtConfigAudience,
         ValidateIssuer = true,
         ValidateAudience = true,
         ClockSkew = TimeSpan.FromSeconds(0),
