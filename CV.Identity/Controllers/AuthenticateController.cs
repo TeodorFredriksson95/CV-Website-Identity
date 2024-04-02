@@ -42,6 +42,8 @@ namespace CV.Identity.Controllers
         private async Task<string> GitHubExchangeCodeForAccessToken(string code)
         {
             var client = new HttpClient();
+            var gitHubSecret = Environment.GetEnvironmentVariable("GitHub_Secret");
+
             var requestContent = new FormUrlEncodedContent(new Dictionary<string, string>
                     {
                         {"client_id", "9ddff8bc7ebe96a759b3"},
@@ -202,7 +204,8 @@ namespace CV.Identity.Controllers
         public async Task<IActionResult> LinkedInCallback([FromBody] LinkedinCode code)
         {
             Console.WriteLine("second callback", code);
-            var redirectUri = "http://localhost:3000/login"; 
+            var redirectUri = "https://unidevweb.com/login";
+
 
             var accessToken = await ExchangeCodeForAccessToken(code.Code, redirectUri);
             if (string.IsNullOrEmpty(accessToken))
@@ -260,7 +263,7 @@ namespace CV.Identity.Controllers
             var clientId = "773qu5fldzxrvs";
 
 
-            var linkedInUrl = $"https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id={clientId}&state={state}&redirect_uri=http://localhost:3000/login&scope=email%20openid%20w_member_social%20profile";
+            var linkedInUrl = $"https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id={clientId}&state={state}&redirect_uri=https://unidevweb.com/login&scope=email%20openid%20w_member_social%20profile";
 
             return Redirect(linkedInUrl);
         }
@@ -317,6 +320,7 @@ namespace CV.Identity.Controllers
         }
         private async Task<string> ExchangeCodeForAccessToken(string code, string redirectUri)
         {
+            var linkedinSecret = Environment.GetEnvironmentVariable("Linkedin_Secret");
             var client = new HttpClient();
             var requestContent = new FormUrlEncodedContent(new[]
             {
@@ -324,7 +328,7 @@ namespace CV.Identity.Controllers
                 new KeyValuePair<string, string>("grant_type", "authorization_code"),
                 new KeyValuePair<string, string>("code", code),
                 new KeyValuePair<string, string>("client_id", "773qu5fldzxrvs"),
-                new KeyValuePair<string, string>("client_secret", "LdQQja6ZlsByMIMn"),
+                new KeyValuePair<string, string>("client_secret", linkedinSecret),
                 new KeyValuePair<string, string>("redirect_uri", redirectUri),
             });
             Console.WriteLine($"{redirectUri}");
@@ -361,32 +365,7 @@ namespace CV.Identity.Controllers
             return null;
         }
 
-        // Model for LinkedIn user info response
-        public class LinkedInUser
-        {
-            [JsonPropertyName("sub")]
-            public string Sub { get; set; }
-            
-            [JsonPropertyName("email_verified")]
-            public bool VerifiedEmail { get; set; }            
-            
-            [JsonPropertyName("given_name")]
-            public string Firstname { get; set; }
-
-            
-
-            [JsonPropertyName("family_name")]
-            public string LastName { get; set; }
-
-            [JsonPropertyName("email")]
-            public string Email { get; set; }
-            [JsonPropertyName("picture")]
-            public string Picture { get; set; }
-
-        }
-        public class LinkedinCode
-        {
-            public string Code { get; set; }
-        }
+    
+ 
     }
 }
