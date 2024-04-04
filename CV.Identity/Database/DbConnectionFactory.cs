@@ -16,18 +16,16 @@ namespace CV.Identity.Database
     public class NpgsqlConnectionFactory: IDbConnectionFactory
     {
         private readonly string _connectionString;
-        private readonly ILogger _logger;
-        public NpgsqlConnectionFactory(string connectionString, ILogger logger)
+
+        public NpgsqlConnectionFactory(string connectionString)
         {
             _connectionString = connectionString;
-            _logger = logger;   
         }
 
         public async Task<IDbConnection> CreateConnectionAsync(CancellationToken token = default)
         {
             try
             {
-                _logger.LogInformation(_connectionString);
                 var connection = new NpgsqlConnection(_connectionString);
                 await connection.OpenAsync(token);
                 Console.WriteLine("Connection opened successfully.");

@@ -18,12 +18,6 @@ Console.WriteLine("CONNECTION STRING: " + connectionString);
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
-var loggerFactory = LoggerFactory.Create(loggingBuilder =>
-{
-    loggingBuilder.AddConsole();
-});
-var logger = loggerFactory.CreateLogger<Program>();
-logger.LogInformation($"Connection string: {connectionString}");
 
 
 builder.Services.AddControllers();
@@ -72,6 +66,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+var loggerFactory = LoggerFactory.Create(loggingBuilder =>
+{
+    loggingBuilder.AddConsole();
+});
+var logger = loggerFactory.CreateLogger<Program>();
+logger.LogInformation($"Connection string: {connectionString}");
 
 //app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseCors("AllowSpecificOrigin");

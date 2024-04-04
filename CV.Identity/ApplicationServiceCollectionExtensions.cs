@@ -52,8 +52,9 @@ namespace CV.Identity
             return services;
         }
 
-        public static IServiceCollection AddDatabase(this IServiceCollection services, string connectionString)
+        public static IServiceCollection AddDatabase(this IServiceCollection services, string connectionString, ILogger logger)
         {
+            logger.LogInformation(connectionString);
             services.AddSingleton<IDbConnectionFactory>(_ => new NpgsqlConnectionFactory(connectionString));
             services.AddSingleton<DbInitializer>();
             return services;
