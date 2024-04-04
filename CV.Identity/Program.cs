@@ -26,7 +26,7 @@ builder.Services.AddSwaggerGen();
 
 if (connectionString != null)
 {
-    builder.Services.AddDatabase(connectionString);
+    builder.Services.AddDatabase("Host=unidevweb-database.postgres.database.azure.com;Database=CV-Backend-Production;Port=5432;User Id=Teo;Password=Taurologi95!;");
 }
 else
 {
