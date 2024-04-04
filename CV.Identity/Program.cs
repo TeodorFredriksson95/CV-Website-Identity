@@ -17,7 +17,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddApplication();
 
 if (connectionString != null)
 {
@@ -50,6 +49,9 @@ builder.Services.AddAuthentication(x =>
 
     };
 });
+
+builder.Services.AddApplication();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
