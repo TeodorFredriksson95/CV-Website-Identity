@@ -12,6 +12,7 @@ string connectionString = Environment.GetEnvironmentVariable("unidevwebcon")!;
 var jwtTokenSecret = Environment.GetEnvironmentVariable("JWT_TOKEN_SECRET");
 var jwtConfigIssuer = Environment.GetEnvironmentVariable("IDENTITY_JWTCONFIG_ISSUER");
 var jwtConfigAudience = Environment.GetEnvironmentVariable("IDENTITY_JWTCONFIG_AUDIENCE");
+builder.Services.AddApplication();
 
 Console.WriteLine("CONNECTION STRING: " + connectionString);
 
@@ -61,9 +62,9 @@ builder.Services.AddAuthentication(x =>
     };
 });
 
-builder.Services.AddApplication();
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
