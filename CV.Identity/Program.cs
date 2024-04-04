@@ -24,15 +24,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-if (connectionString != null)
-{
-    builder.Services.AddDatabase("Host=unidevweb-database.postgres.database.azure.com;Database=CV-Backend-Production;Port=5432;User Id=Teo;Password=Taurologi95!;");
-}
-else
-{
-    builder.Services.AddDatabase(Environment.GetEnvironmentVariable("unidevwebcon", EnvironmentVariableTarget.Process)!);
+builder.Services.AddDatabase(connectionString);
 
-}
+
 builder.Services.AddJWTService(builder.Configuration);
 builder.Services.AddCorsPolicy(builder.Configuration);
 builder.Services.AddAuthentication(x =>
