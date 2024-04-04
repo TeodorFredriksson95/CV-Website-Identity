@@ -8,10 +8,10 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 
-string connectionString = Environment.GetEnvironmentVariable("unidevwebcon")!;
-var jwtTokenSecret = Environment.GetEnvironmentVariable("JWT_TOKEN_SECRET");
-var jwtConfigIssuer = Environment.GetEnvironmentVariable("IDENTITY_JWTCONFIG_ISSUER");
-var jwtConfigAudience = Environment.GetEnvironmentVariable("IDENTITY_JWTCONFIG_AUDIENCE");
+string connectionString = Environment.GetEnvironmentVariable("unidevwebcon", EnvironmentVariableTarget.Process)!;
+var jwtTokenSecret = Environment.GetEnvironmentVariable("JWT_TOKEN_SECRET", EnvironmentVariableTarget.Process);
+var jwtConfigIssuer = Environment.GetEnvironmentVariable("IDENTITY_JWTCONFIG_ISSUER", EnvironmentVariableTarget.Process);
+var jwtConfigAudience = Environment.GetEnvironmentVariable("IDENTITY_JWTCONFIG_AUDIENCE", EnvironmentVariableTarget.Process);
 builder.Services.AddApplication();
 
 Console.WriteLine("CONNECTION STRING: " + connectionString);
@@ -30,7 +30,7 @@ if (connectionString != null)
 }
 else
 {
-    builder.Services.AddDatabase(Environment.GetEnvironmentVariable("unidevwebcon")!);
+    builder.Services.AddDatabase(Environment.GetEnvironmentVariable("unidevwebcon", EnvironmentVariableTarget.Process)!);
 
 }
 builder.Services.AddJWTService(builder.Configuration);
