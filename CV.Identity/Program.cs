@@ -72,7 +72,7 @@ var loggerFactory = LoggerFactory.Create(loggingBuilder =>
 });
 var logger = loggerFactory.CreateLogger<Program>();
 logger.LogInformation($"Connection string: CON STRING SHOULD BE HERE:::{connectionString}");
-logger.LogInformation($"HERE ARE OTHER ENV VARIABLES: secret{jwtTokenSecret}, issuer {jwtConfigIssuer}")
+logger.LogInformation($"HERE ARE OTHER ENV VARIABLES: secret{jwtTokenSecret}, issuer {jwtConfigIssuer}");
 
 //app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseCors("AllowSpecificOrigin");
