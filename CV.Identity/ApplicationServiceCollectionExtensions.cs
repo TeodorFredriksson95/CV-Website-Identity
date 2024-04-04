@@ -52,9 +52,10 @@ namespace CV.Identity
             return services; 
         }
 
-        public static IServiceCollection AddDatabase(this IServiceCollection services, string connectionString)
+        public static IServiceCollection AddDatabase(this IServiceCollection services)
         {
-            services.AddSingleton<IDbConnectionFactory>(_ => new NpgsqlConnectionFactory("Host=unidevweb-database.postgres.database.azure.com;Database=CV-Backend-Production;Port=5432;User Id=Teo;Password=Taurologi95!;"));
+            string connectionString = Environment.GetEnvironmentVariable("unidevwebcon")!;
+            services.AddSingleton<IDbConnectionFactory>(_ => new NpgsqlConnectionFactory(connectionString));
             services.AddSingleton<DbInitializer>();
             return services;
         }
