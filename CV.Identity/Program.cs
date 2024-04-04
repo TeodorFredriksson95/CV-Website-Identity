@@ -13,6 +13,8 @@ var jwtTokenSecret = Environment.GetEnvironmentVariable("JWT_TOKEN_SECRET");
 var jwtConfigIssuer = Environment.GetEnvironmentVariable("IDENTITY_JWTCONFIG_ISSUER");
 var jwtConfigAudience = Environment.GetEnvironmentVariable("IDENTITY_JWTCONFIG_AUDIENCE");
 
+Console.WriteLine("CONNECTION STRING: " + connectionString);
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
