@@ -49,7 +49,7 @@ namespace CV.Identity
             services.AddScoped<IUserService, UserService>(); 
             services.AddScoped<IUserRepository, UserRepository>(); 
 
-            return services;
+            return services; 
         }
 
         public static IServiceCollection AddDatabase(this IServiceCollection services, string connectionString)
