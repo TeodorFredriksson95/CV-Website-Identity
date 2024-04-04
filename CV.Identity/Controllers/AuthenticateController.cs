@@ -43,7 +43,7 @@ namespace CV.Identity.Controllers
         {
             var client = new HttpClient();
             var gitHubSecret = Environment.GetEnvironmentVariable("GitHub_Secret");
-
+            Console.WriteLine(gitHubSecret);
             var requestContent = new FormUrlEncodedContent(new Dictionary<string, string>
                     {
                         {"client_id", "9ddff8bc7ebe96a759b3"},
