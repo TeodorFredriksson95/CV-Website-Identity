@@ -8,7 +8,7 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 
-string connectionString = Environment.GetEnvironmentVariable("unidevwebcon", EnvironmentVariableTarget.Process)!;
+string connectionString = Environment.GetEnvironmentVariable("unidevwebcon")!;
 var jwtTokenSecret = Environment.GetEnvironmentVariable("JWT_TOKEN_SECRET", EnvironmentVariableTarget.Process);
 var jwtConfigIssuer = Environment.GetEnvironmentVariable("IDENTITY_JWTCONFIG_ISSUER", EnvironmentVariableTarget.Process);
 var jwtConfigAudience = Environment.GetEnvironmentVariable("IDENTITY_JWTCONFIG_AUDIENCE", EnvironmentVariableTarget.Process);
