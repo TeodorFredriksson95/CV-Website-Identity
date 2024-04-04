@@ -15,10 +15,19 @@ var jwtConfigAudience = Environment.GetEnvironmentVariable("IDENTITY_JWTCONFIG_A
 
 Console.WriteLine("CONNECTION STRING: " + connectionString);
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+var loggerFactory = LoggerFactory.Create(loggingBuilder =>
+{
+    loggingBuilder.AddConsole();
+});
+var logger = loggerFactory.CreateLogger<Program>();
+logger.LogInformation($"Connection string: {connectionString}");
+
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 
 if (connectionString != null)
 {
@@ -69,6 +78,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllers();
 
