@@ -5,7 +5,7 @@ namespace CV.Identity.Models
     public class GithubEmail
     {
         [JsonPropertyName("email")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [JsonPropertyName("primary")]
         public bool Primary { get; set; }
@@ -15,6 +15,6 @@ namespace CV.Identity.Models
 
         // If you decide to use the visibility field later on
         [JsonPropertyName("visibility")]
-        public string Visibility { get; set; }
+        public string? Visibility { get; set; }
     }
 }

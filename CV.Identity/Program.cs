@@ -69,7 +69,7 @@ logger.LogInformation($"Connection string: CON STRING SHOULD BE HERE:::{connecti
 logger.LogInformation($"HERE ARE OTHER ENV VARIABLES: secret{jwtTokenSecret}, issuer {jwtConfigIssuer}");
 
 //app.UseMiddleware<RequestLoggingMiddleware>();
-app.UseCors("AllowSpecificOrigin");
+//app.UseCors("AllowSpecificOrigin");
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
