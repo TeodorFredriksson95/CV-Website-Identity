@@ -18,7 +18,16 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddApplication();
-builder.Services.AddDatabase(connectionString);
+
+if (connectionString != null)
+{
+    builder.Services.AddDatabase(connectionString);
+}
+else
+{
+    builder.Services.AddDatabase(Environment.GetEnvironmentVariable("unidevwebcon")!);
+
+}
 builder.Services.AddJWTService(builder.Configuration);
 builder.Services.AddCorsPolicy(builder.Configuration);
 builder.Services.AddAuthentication(x =>
