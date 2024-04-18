@@ -18,24 +18,26 @@ namespace CV.Identity.Services.ConfigurationService
 
         public string GetJwtApiAudience()
         {
-            return _configuration["ApiAccess:Audience"]!;
+            //return _configuration["ApiAccess:Audience"]!;
+            return Environment.GetEnvironmentVariable("IDENTITY_APIACCESS_AUDIENCE", EnvironmentVariableTarget.Process);
         }
 
         public string GetJwtApiIssuer()
         {
-            return _configuration["ApiAccess:Issuer"]!;
+            //return _configuration["ApiAccess:Issuer"]!;
+            return Environment.GetEnvironmentVariable("IDENTITY_APIACCESS_ISSUER", EnvironmentVariableTarget.Process);
         }
 
-        public string GetJwtConfigAudience() => _configuration["JwtConfig:Authentication:Audience"]!;
+        public string GetJwtConfigAudience() => Environment.GetEnvironmentVariable("IDENTITY_JWTCONFIG_AUDIENCE", EnvironmentVariableTarget.Process);
 
         public string GetJwtConfigIssuer()
         {
-            return _configuration["JwtConfig:Authentication:Issuer"]!;
+            return Environment.GetEnvironmentVariable("IDENTITY_JWTCONFIG_ISSUER", EnvironmentVariableTarget.Process);
         }
 
         public string GetJwtSecretKey()
         {
-            return _configuration.GetValue<string>("JWT_TOKEN_SECRET")!;
+            return Environment.GetEnvironmentVariable("JWT_TOKEN_SECRET", EnvironmentVariableTarget.Process);
         }
 
     }
